@@ -100,4 +100,5 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
         jrq = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
         rq.add(jrq);
     }
+
 }
