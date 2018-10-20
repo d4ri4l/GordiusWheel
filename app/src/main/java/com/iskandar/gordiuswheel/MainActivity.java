@@ -85,7 +85,8 @@ public class MainActivity extends AppCompatActivity
             android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
             fm.beginTransaction().replace(R.id.escenario, new CuentaFragment()).commit();
         } else if (id == R.id.nav_rutas) {
-
+            Intent i = new Intent(getApplicationContext(), RutasActivity.class);
+            startActivity(i);
         } else if (id == R.id.nav_favoritos) {
             android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
             fm.beginTransaction().replace(R.id.escenario, new FavoritosFragment()).commit();
