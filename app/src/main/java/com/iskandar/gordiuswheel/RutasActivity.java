@@ -1,8 +1,9 @@
 package com.iskandar.gordiuswheel;
 
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -11,14 +12,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.Feature;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import com.google.maps.android.kml.KmlLayer;
+import com.google.maps.android.kml.KmlPlacemark;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,9 +55,6 @@ public class RutasActivity extends FragmentActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        rq = Volley.newRequestQueue(this);
-
     }
 
 
@@ -70,38 +70,31 @@ public class RutasActivity extends FragmentActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        rq = Volley.newRequestQueue(this);
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(24.1232615, -110.4094786);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng position = new LatLng(24.124040, -110.311814);
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        CameraUpdate update = CameraUpdateFactory.newLatLng(position);
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(12);
+
+        mMap.moveCamera(update);
+        mMap.animateCamera(zoom);
         //retrieveFileFromResource();
 
-        /*
-        for(i=1;i<=5;i++)
-        {
-            GetName(i);
-            if(ii==1)
-            {
-                i=1000;
-            }
-            else{
-                urlrutas="https://gordiuswheelyae.000webhostapp.com/Rutas/"+name;
-                retrieveFileFromUrl();
-            }
-        }*/
 
-        etName();
-        urlrutas="https://gordiuswheelyae.000webhostapp.com/Rutas/R62.kml";
-        if(x==1)
-        retrieveFileFromUrl();
+        for(i=1;i<100;i++)
+        {
+            etName(i);
+
+        }
     }
 
 
 
-    private void etName(){
+    private void etName(int id){
 
-        String url="https://gordiuswheelyae.000webhostapp.com/Rutas.php?id=1";
+        String url="https://gordiuswheelyae.000webhostapp.com/Rutas.php?id="+id;
 
         //String url="https://semilio9818.000webhostapp.com/sesion.php?email="+BoxUser.getText().toString()+"&pass="+BoxPass.getText().toString();
 
@@ -109,18 +102,37 @@ public class RutasActivity extends FragmentActivity implements OnMapReadyCallbac
         rq.add(jrq);
     }
 
-    private void retrieveFileFromUrl() {
-        new DownloadKmlFile(urlrutas).execute();
-    }
 
     @Override
     public void onErrorResponse(VolleyError volleyError) {
-        x=2;
+        i=101;
     }
 
     @Override
     public void onResponse(JSONObject jsonObject) {
-        x=1;
+        JSONArray jsonArray = jsonObject.optJSONArray("datos");
+        JSONObject jsonObject1 = null;
+
+        try {
+            jsonObject1 = jsonArray.getJSONObject(0);
+            setName(jsonObject1.optString("Archivo"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        urlrutas="https://gordiuswheelyae.000webhostapp.com/Rutas/"+name;
+        retrieveFileFromUrl();
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    private void retrieveFileFromUrl() {
+        new DownloadKmlFile(urlrutas).execute();
     }
 
     private class DownloadKmlFile extends AsyncTask<String, Void, byte[]> {
@@ -152,6 +164,14 @@ public class RutasActivity extends FragmentActivity implements OnMapReadyCallbac
                 KmlLayer kmlLayer = new KmlLayer(mMap, new ByteArrayInputStream(byteArr),
                         getApplicationContext());
                 kmlLayer.addLayerToMap();
+                kmlLayer.setOnFeatureClick(new KmlLayer.OnFeatureClick() {
+                    @Override
+                    public void onFeatureClick(Feature feature) {
+                        Toast.makeText(RutasActivity.this,
+                                "Feature clicked: " + feature.getId(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -173,9 +193,4 @@ public class RutasActivity extends FragmentActivity implements OnMapReadyCallbac
         }
     }
     */
-
-    public String setName(String name) {
-        this.name = name;
-        return name;
-    }
 }
