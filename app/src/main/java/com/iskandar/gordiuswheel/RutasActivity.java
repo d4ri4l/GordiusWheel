@@ -164,14 +164,6 @@ public class RutasActivity extends FragmentActivity implements OnMapReadyCallbac
                 KmlLayer kmlLayer = new KmlLayer(mMap, new ByteArrayInputStream(byteArr),
                         getApplicationContext());
                 kmlLayer.addLayerToMap();
-                kmlLayer.setOnFeatureClick(new KmlLayer.OnFeatureClick() {
-                    @Override
-                    public void onFeatureClick(Feature feature) {
-                        Toast.makeText(RutasActivity.this,
-                                "Feature clicked: " + feature.getId(),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
             } catch (IOException e) {
